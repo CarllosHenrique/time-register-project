@@ -1,7 +1,8 @@
+# spec/factories/timer_registers.rb
 FactoryBot.define do
   factory :timer_register do
-    user { nil }
-    clock_in { "2025-09-22 10:43:00" }
-    clock_out { "2025-09-22 10:43:00" }
+    association :user
+    clock_in  { Time.current - 2.hours }
+    clock_out { Time.current - 1.hour }
   end
 end

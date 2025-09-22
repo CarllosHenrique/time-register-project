@@ -13,6 +13,7 @@ gem "sidekiq", "~> 7.2"
 gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
+gem "csv"
 
 gem "bootsnap", require: false
 
