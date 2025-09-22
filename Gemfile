@@ -8,7 +8,7 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 
 gem "rack-cors"
 gem "oj", "~> 3.16"
-gem "sidekiq", "~> 7.2"
+gem "sidekiq", "~> 8.0"
 
 gem "solid_cache"
 gem "solid_queue"
