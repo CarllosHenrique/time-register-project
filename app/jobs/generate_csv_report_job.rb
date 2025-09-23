@@ -1,5 +1,6 @@
 # app/jobs/generate_csv_report_job.rb
 require "csv"
+
 class GenerateCsvReportJob < ApplicationJob
   queue_as :default
 
@@ -7,17 +8,17 @@ class GenerateCsvReportJob < ApplicationJob
     rp = ReportProcess.find(report_process_id)
     rp.update!(status: :processing, started_at: Time.current, progress: 1)
 
-    user = rp.user
-    start_dt = Date.parse(start_date.to_s).beginning_of_day
-    end_dt   = Date.parse(end_date.to_s).end_of_day
+    user    = rp.user
+    start_dt = start_date.is_a?(Date) ? start_date.beginning_of_day : Date.parse(start_date.to_s).beginning_of_day
+    end_dt   = end_date.is_a?(Date)   ? end_date.end_of_day         : Date.parse(end_date.to_s).end_of_day
 
     scope = user.timer_registers.where(clock_in: start_dt..end_dt)
 
-    dir = Rails.root.join("storage", "reports", user.id.to_s)
+    dir  = Rails.root.join("storage", "reports", user.id.to_s)
     FileUtils.mkdir_p(dir)
     path = dir.join("report_#{rp.uid}.csv").to_s
 
-    total = scope.count
+    total     = scope.count
     processed = 0
 
     CSV.open(path, "w") do |csv|

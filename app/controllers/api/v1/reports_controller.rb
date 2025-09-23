@@ -1,19 +1,42 @@
 # app/controllers/api/v1/reports_controller.rb
 class Api::V1::ReportsController < ApplicationController
+  before_action :set_report_process, only: [ :status, :download ]
+
   def status
-    rp = ReportProcess.find_by!(uid: params[:uid])
     render json: {
-      process_id: rp.uid,
-      status: rp.status,
-      progress: rp.progress
+      process_id: @report_process.uid,
+      status: @report_process.status,
+      progress: @report_process.progress
     }
   end
 
   def download
-    rp = ReportProcess.find_by!(uid: params[:uid])
-    return render json: { error: "Relatório não está pronto" },
-                  status: :unprocessable_content unless rp.status_completed? && rp.file_path && File.exist?(rp.file_path)
+    result = ::Reports::DownloadReport.call(@report_process)
 
-    send_file rp.file_path, type: "text/csv", disposition: "attachment", filename: File.basename(rp.file_path)
+    unless result.ok
+      return render json: { error: error_message(result.error) }, status: :unprocessable_content
+    end
+
+    send_file result.path,
+              type: "text/csv",
+              disposition: "attachment",
+              filename: result.filename
+  end
+
+  private
+
+  def set_report_process
+    begin
+      @report_process = ReportProcess.find_by!(uid: params[:uid])
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: "Processo de relatório não encontrado" }, status: :not_found
+    end
+  end
+
+  def error_message(code)
+    {
+      not_ready:   "Relatório não está pronto",
+      unsafe_path: "Caminho de arquivo inválido"
+    }[code] || "Não foi possível baixar o relatório"
   end
 end

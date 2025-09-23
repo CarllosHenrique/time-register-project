@@ -1,4 +1,4 @@
-# app/controllers/api/v1/time_registers_controller.rb
+# app/controllers/api/v1/timer_registers_controller.rb
 class Api::V1::TimerRegistersController < ApplicationController
   before_action :set_tr, only: %i[show update destroy]
 
@@ -21,7 +21,7 @@ class Api::V1::TimerRegistersController < ApplicationController
 
   def update
     if @tr.update(tr_params)
-      render json: @tr
+      render json: @tr, status: :ok
     else
       render json: { errors: @tr.errors.full_messages }, status: :unprocessable_content
     end
@@ -35,7 +35,11 @@ class Api::V1::TimerRegistersController < ApplicationController
   private
 
   def set_tr
-    @tr = TimerRegister.find(params[:id])
+    begin
+      @tr = TimerRegister.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: "Registro de ponto não encontrado" }, status: :not_found
+    end
   end
 
   def tr_params

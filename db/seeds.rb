@@ -19,7 +19,7 @@ ActiveRecord::Base.transaction do
     base_days = (1..120).to_a.sample(20).sort
     base_days.each do |d|
       day = d.days.ago.to_date
-      clock_in  = Time.zone.local(day.year, day.month, day.day, 8 + rand(0..1), [0, 5, 10, 15, 20].sample)
+      clock_in  = Time.zone.local(day.year, day.month, day.day, 8 + rand(0..1), [ 0, 5, 10, 15, 20 ].sample)
       lunch_out = clock_in + 4.hours + rand(0..20).minutes
       lunch_in  = lunch_out + 1.hour + rand(0..15).minutes
       clock_out = lunch_in + 4.hours + rand(0..20).minutes
